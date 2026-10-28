@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createClient, type SupabaseClient, type Session } from '@supabase/supabase-js';
-import { AlertCircle, Braces, Check, ChevronLeft, ChevronRight, CircleHelp, Database, FileCode2, LogOut, Menu, Moon, Plus, RefreshCw, Search, Sun, Table2, Trash2, X } from 'lucide-react';
+import { AlertCircle, Binary, Braces, Calendar, Check, ChevronLeft, ChevronRight, CircleHelp, Clock, Database, FileCode2, Fingerprint, Hash, LogOut, Menu, Moon, Plus, RefreshCw, Search, Sun, Table2, Text, ToggleLeft, Trash2, X } from 'lucide-react';
 import './styles/theme.css';
 
 /* ========================= SUPABASE CONFIG =========================
@@ -25,8 +25,8 @@ const byId = (list: Record<string, unknown>[]) => [...list].sort((a, b) => { con
 function cleanRowData(rowData: Record<string, string>): Record<string, unknown> { const skip = new Set(['id', 'created_at', 'updated_at']); return Object.fromEntries(Object.entries(rowData).filter(([key]) => !skip.has(key.toLowerCase())).map(([key, value]) => [key, value.trim() === '' ? null : value])); }
 
 const copy = {
-  ar: { brand: 'عارض البيانات', sub: 'عرض وتعديل · Supabase', tables: 'الجداول', overview: 'نظرة عامة', connection: 'حالة الاتصال', connected: 'متصل', offline: 'غير متصل', setupTitle: 'أضف مفتاح anon لبدء الاتصال', setup: 'هذا العرض جاهز للاتصال بقاعدة Supabase. استبدل القيمة التجريبية في كتلة الإعدادات أعلى App.tsx بمفتاح anon العام فقط.', sql: 'SQL المطلوب', table: 'الجدول', rows: 'الصفوف', columns: 'الأعمدة', showing: 'عرض', of: 'من', search: 'ابحث في الصفحة الحالية…', previous: 'السابق', next: 'التالي', noTables: 'لا توجد جداول متاحة', noTablesCopy: 'سيتم تحديث القائمة تلقائياً عند ظهور جداول جديدة.', noRows: 'لا توجد بيانات', noRowsCopy: 'هذا الجدول لا يحتوي على صفوف في الصفحة الحالية.', loading: 'جاري تحميل البيانات…', error: 'تعذر تحميل البيانات', permission: 'تحقق من صلاحيات القراءة وسياسة RLS الخاصة بالجدول.', live: 'مباشر', offlineLive: 'متوقف', refresh: 'تحديث', light: 'الوضع الفاتح', dark: 'الوضع الداكن', language: 'English', copySql: 'SQL لـ Supabase', discovered: 'تم اكتشاف جدول جديد', null: 'فارغ', showMore: 'عرض المزيد', showLess: 'عرض أقل', configMissing: 'الإعداد غير مكتمل', close: 'إغلاق', sortAsc: 'ترتيب تصاعدي', sortDesc: 'ترتيب تنازلي', updated: 'تحديث مباشر', inserted: 'صف جديد', deleted: 'تم حذف صف', addRow: 'إضافة صف', save: 'حفظ', cancel: 'إلغاء', saving: 'جاري الحفظ…', insertError: 'فشل إضافة الصف', editRow: 'تعديل الصف', updateError: 'فشل تعديل الصف', noId: 'لا يمكن تعديل أو حذف صف بدون id', deleteRow: 'حذف الصف', confirmDelete: 'تأكيد حذف هذا الصف؟', deleteError: 'فشل حذف الصف', addColumn: 'إضافة عمود', columnName: 'اسم العمود الجديد', columnType: 'نوع العمود: text, integer, bigint, numeric, boolean, jsonb, date, timestamptz, uuid', columnAdded: 'تمت إضافة العمود', addColumnError: 'فشل إضافة العمود', logout: 'تسجيل الخروج', loginTitle: 'تسجيل الدخول', loginSub: 'أدخل بياناتك للوصول إلى عارض البيانات', email: 'البريد الإلكتروني', password: 'كلمة المرور', loginButton: 'دخول', loggingIn: 'جاري الدخول…', loginError: 'البريد الإلكتروني أو كلمة المرور غير صحيحة', loginUnauthorized: 'هذا البريد الإلكتروني غير مصرح له بالدخول', checkingSession: 'جاري التحقق من الجلسة…' },
-  en: { brand: 'Data Viewer', sub: 'View & edit · Supabase', tables: 'Tables', overview: 'Overview', connection: 'Connection', connected: 'Connected', offline: 'Offline', setupTitle: 'Add your anon key to connect', setup: 'This viewer is ready for Supabase. Replace the placeholder in the config block at the top of App.tsx with the public anon key only.', sql: 'Required SQL', table: 'Table', rows: 'Rows', columns: 'Columns', showing: 'Showing', of: 'of', search: 'Search current page…', previous: 'Previous', next: 'Next', noTables: 'No tables available', noTablesCopy: 'The list will update automatically when tables appear.', noRows: 'No data found', noRowsCopy: 'This table has no rows on the current page.', loading: 'Loading data…', error: 'Could not load data', permission: 'Check read permissions and the table RLS policy.', live: 'Live', offlineLive: 'Offline', refresh: 'Refresh', light: 'Light mode', dark: 'Dark mode', language: 'العربية', copySql: 'SQL for Supabase', discovered: 'New table discovered', null: 'Empty', showMore: 'Show more', showLess: 'Show less', updated: 'Live update', inserted: 'New row', deleted: 'Row deleted', addRow: 'Add Row', save: 'Save', cancel: 'Cancel', saving: 'Saving…', insertError: 'Failed to insert row', editRow: 'Edit Row', updateError: 'Failed to update row', noId: 'Cannot edit or delete a row without an id', deleteRow: 'Delete row', confirmDelete: 'Delete this row?', deleteError: 'Failed to delete row', addColumn: 'Add column', columnName: 'New column name', columnType: 'Column type: text, integer, bigint, numeric, boolean, jsonb, date, timestamptz, uuid', columnAdded: 'Column added', addColumnError: 'Failed to add column', logout: 'Sign out', loginTitle: 'Sign in', loginSub: 'Enter your credentials to access the data viewer', email: 'Email address', password: 'Password', loginButton: 'Sign in', loggingIn: 'Signing in…', loginError: 'Incorrect email or password', loginUnauthorized: 'This email is not authorised to access the viewer', checkingSession: 'Checking session…' }
+  ar: { brand: 'عارض البيانات', sub: 'عرض وتعديل · Supabase', tables: 'الجداول', overview: 'نظرة عامة', connection: 'حالة الاتصال', connected: 'متصل', offline: 'غير متصل', setupTitle: 'أضف مفتاح anon لبدء الاتصال', setup: 'هذا العرض جاهز للاتصال بقاعدة Supabase. استبدل القيمة التجريبية في كتلة الإعدادات أعلى App.tsx بمفتاح anon العام فقط.', sql: 'SQL المطلوب', table: 'الجدول', rows: 'الصفوف', columns: 'الأعمدة', showing: 'عرض', of: 'من', search: 'ابحث في الصفحة الحالية…', previous: 'السابق', next: 'التالي', noTables: 'لا توجد جداول متاحة', noTablesCopy: 'سيتم تحديث القائمة تلقائياً عند ظهور جداول جديدة.', noRows: 'لا توجد بيانات', noRowsCopy: 'هذا الجدول لا يحتوي على صفوف في الصفحة الحالية.', loading: 'جاري تحميل البيانات…', error: 'تعذر تحميل البيانات', permission: 'تحقق من صلاحيات القراءة وسياسة RLS الخاصة بالجدول.', live: 'مباشر', offlineLive: 'متوقف', refresh: 'تحديث', light: 'الوضع الفاتح', dark: 'الوضع الداكن', language: 'English', copySql: 'SQL لـ Supabase', discovered: 'تم اكتشاف جدول جديد', null: 'فارغ', showMore: 'عرض المزيد', showLess: 'عرض أقل', configMissing: 'الإعداد غير مكتمل', close: 'إغلاق', sortAsc: 'ترتيب تصاعدي', sortDesc: 'ترتيب تنازلي', updated: 'تحديث مباشر', inserted: 'صف جديد', deleted: 'تم حذف صف', addRow: 'إضافة صف', save: 'حفظ', cancel: 'إلغاء', saving: 'جاري الحفظ…', insertError: 'فشل إضافة الصف', editRow: 'تعديل الصف', updateError: 'فشل تعديل الصف', noId: 'لا يمكن تعديل أو حذف صف بدون id', deleteRow: 'حذف الصف', confirmDelete: 'تأكيد حذف هذا الصف؟', deleteError: 'فشل حذف الصف', addColumn: 'إضافة عمود', columnName: 'اسم العمود الجديد', columnType: 'نوع العمود: text, integer, bigint, numeric, boolean, jsonb, date, timestamptz, uuid', columnAdded: 'تمت إضافة العمود', addColumnError: 'فشل إضافة العمود', addColumnTitle: 'إضافة عمود', colNameLabel: 'اسم العمود', colNamePlaceholder: 'مثال: user_id', colNameError: 'اسم غير صالح — أحرف إنجليزية وأرقام وشرطة سفلية فقط', colTypeLabel: 'نوع العمود', add: 'إضافة', confirmDeleteTitle: 'حذف الصف', confirmDeleteBody: 'هل أنت متأكد من حذف هذا الصف؟ لا يمكن التراجع.', delete: 'حذف', logout: 'تسجيل الخروج', loginTitle: 'تسجيل الدخول', loginSub: 'أدخل بياناتك للوصول إلى عارض البيانات', email: 'البريد الإلكتروني', password: 'كلمة المرور', loginButton: 'دخول', loggingIn: 'جاري الدخول…', loginError: 'البريد الإلكتروني أو كلمة المرور غير صحيحة', loginUnauthorized: 'هذا البريد الإلكتروني غير مصرح له بالدخول', checkingSession: 'جاري التحقق من الجلسة…' },
+  en: { brand: 'Data Viewer', sub: 'View & edit · Supabase', tables: 'Tables', overview: 'Overview', connection: 'Connection', connected: 'Connected', offline: 'Offline', setupTitle: 'Add your anon key to connect', setup: 'This viewer is ready for Supabase. Replace the placeholder in the config block at the top of App.tsx with the public anon key only.', sql: 'Required SQL', table: 'Table', rows: 'Rows', columns: 'Columns', showing: 'Showing', of: 'of', search: 'Search current page…', previous: 'Previous', next: 'Next', noTables: 'No tables available', noTablesCopy: 'The list will update automatically when tables appear.', noRows: 'No data found', noRowsCopy: 'This table has no rows on the current page.', loading: 'Loading data…', error: 'Could not load data', permission: 'Check read permissions and the table RLS policy.', live: 'Live', offlineLive: 'Offline', refresh: 'Refresh', light: 'Light mode', dark: 'Dark mode', language: 'العربية', copySql: 'SQL for Supabase', discovered: 'New table discovered', null: 'Empty', showMore: 'Show more', showLess: 'Show less', updated: 'Live update', inserted: 'New row', deleted: 'Row deleted', addRow: 'Add Row', save: 'Save', cancel: 'Cancel', saving: 'Saving…', insertError: 'Failed to insert row', editRow: 'Edit Row', updateError: 'Failed to update row', noId: 'Cannot edit or delete a row without an id', deleteRow: 'Delete row', confirmDelete: 'Delete this row?', deleteError: 'Failed to delete row', addColumn: 'Add column', columnName: 'New column name', columnType: 'Column type: text, integer, bigint, numeric, boolean, jsonb, date, timestamptz, uuid', columnAdded: 'Column added', addColumnError: 'Failed to add column', addColumnTitle: 'Add column', colNameLabel: 'Column name', colNamePlaceholder: 'e.g. user_id', colNameError: 'Invalid name — letters, digits and underscores only', colTypeLabel: 'Column type', add: 'Add', confirmDeleteTitle: 'Delete row', confirmDeleteBody: 'Are you sure you want to delete this row? This cannot be undone.', delete: 'Delete', logout: 'Sign out', loginTitle: 'Sign in', loginSub: 'Enter your credentials to access the data viewer', email: 'Email address', password: 'Password', loginButton: 'Sign in', loggingIn: 'Signing in…', loginError: 'Incorrect email or password', loginUnauthorized: 'This email is not authorised to access the viewer', checkingSession: 'Checking session…' }
 } as const;
 
 /* ========================= LOGIN PAGE ========================= */
@@ -212,6 +212,132 @@ const t = copy[locale];
   return <><div className="table-scroll"><table><thead><tr>{columns.map((column) => <th key={column.name}><span className="th-label">{column.name}</span></th>)}<th className="th-actions"><button className="row-btn" onClick={onAddColumn} title={t.addColumn}><Plus size={14} /></button></th></tr></thead><tbody>{pagedRows.map((row, rowIndex) => { const rowKey = String(row.id ?? `idx-${rowIndex}`); const isEditing = editingRowId === rowKey; return <tr key={`${rowKey}-${rowIndex}`} className={`${rowIndex === 0 && rows.length && rowIndex === 0 ? 'realtime-row' : ''} ${isEditing ? 'editing-row' : ''} ${savingEdit && isEditing ? 'saving-row' : ''}`}>{columns.map((column) => { const skip = filterOut.has(column.name); if (isEditing) return <td key={column.name}>{skip ? <span className="cell-null">—</span> : <input className="cell-input" value={editData[column.name] ?? ''} onChange={(e) => onEditData(column.name, e.target.value)} placeholder={`${column.name}...`} disabled={savingEdit} />}</td>; return <td key={column.name} onDoubleClick={() => onStartEdit(row, rowKey)}><span className="editable-cell">{formatValue(row[column.name], column, locale, expanded === `${rowKey}-${column.name}`, () => setExpanded(expanded === `${rowKey}-${column.name}` ? null : `${rowKey}-${column.name}`))}</span></td>; })}{isEditing ? <td className="td-actions"><div className="row-actions"><button className="row-btn save" onClick={onSaveEdit} disabled={savingEdit} title={t.save}>{savingEdit ? <RefreshCw size={14} className="spin" /> : <Check size={14} />}</button><button className="row-btn cancel" onClick={onCancelEdit} disabled={savingEdit} title={t.cancel}><X size={14} /></button></div></td> : <td className="td-actions"><div className="row-actions"><button className="row-btn edit-pen" onClick={() => onStartEdit(row, rowKey)} title={t.editRow}><span className="pen-icon">✎</span></button><button className="row-btn cancel" onClick={() => onDelete(rowKey)} title={t.deleteRow}><Trash2 size={14} /></button></div></td>}</tr>; })}{newRowActive && <tr className={`new-row-active ${savingNew ? 'saving-row' : ''}`}>{columns.map((column) => { const skip = filterOut.has(column.name); return <td key={column.name}>{skip ? <span className="cell-null">—</span> : <input className="cell-input" value={newRowData[column.name] ?? ''} onChange={(e) => onNewRowData(column.name, e.target.value)} placeholder={`${column.name}...`} disabled={savingNew} />}</td>; })}<td className="td-actions"><div className="row-actions"><button className="row-btn save" onClick={onSaveNew} disabled={savingNew} title={t.save}>{savingNew ? <RefreshCw size={14} className="spin" /> : <Check size={14} />}</button><button className="row-btn cancel" onClick={onCancelNew} disabled={savingNew} title={t.cancel}><X size={14} /></button></div></td></tr>}</tbody></table></div><div className="table-bottom-bar"><div className="pagination"><span>{t.showing} {pagedRows.length} {t.of} {sortedRows.length}</span><div className="pagination-controls"><button className="control-button" disabled={page <= 0} onClick={() => onPage(page - 1)}><ChevronLeft size={15} />{t.previous}</button><button className="control-button" disabled={page >= Math.ceil(sortedRows.length / PAGE_SIZE) - 1} onClick={() => onPage(page + 1)}>{t.next}<ChevronRight size={15} /></button></div></div><button className="primary-button" onClick={newRowActive ? onCancelNew : onSaveNew}><Plus size={15} />{newRowActive ? t.cancel : t.addRow}</button></div></>;
 }
 
+
+/* ========================= COLUMN TYPES CONFIG ========================= */
+type ColType = { value: string; labelAr: string; labelEn: string; icon: React.ReactNode };
+const COLUMN_TYPES: ColType[] = [
+  { value: 'text',        labelAr: 'نص',          labelEn: 'Text',        icon: <Text size={15} /> },
+  { value: 'integer',     labelAr: 'عدد صحيح',    labelEn: 'Integer',     icon: <Hash size={15} /> },
+  { value: 'bigint',      labelAr: 'عدد كبير',    labelEn: 'Big integer', icon: <Binary size={15} /> },
+  { value: 'numeric',     labelAr: 'رقم عشري',    labelEn: 'Numeric',     icon: <Hash size={15} /> },
+  { value: 'boolean',     labelAr: 'منطقي',       labelEn: 'Boolean',     icon: <ToggleLeft size={15} /> },
+  { value: 'jsonb',       labelAr: 'JSON',         labelEn: 'JSONB',       icon: <Braces size={15} /> },
+  { value: 'date',        labelAr: 'تاريخ',        labelEn: 'Date',        icon: <Calendar size={15} /> },
+  { value: 'timestamptz', labelAr: 'تاريخ ووقت',  labelEn: 'Timestamp tz',icon: <Clock size={15} /> },
+  { value: 'uuid',        labelAr: 'UUID',         labelEn: 'UUID',        icon: <Fingerprint size={15} /> },
+];
+
+/* ========================= ADD COLUMN MODAL ========================= */
+function AddColumnModal({ locale, onClose, onSubmit, saving }: { locale: Locale; onClose: () => void; onSubmit: (name: string, type: string) => void; saving: boolean }) {
+  const t = copy[locale];
+  const [name, setName] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [selectedType, setSelectedType] = useState('text');
+
+  const NAME_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+  const handleSubmit = () => {
+    const trimmed = name.trim();
+    if (!trimmed || !NAME_RE.test(trimmed)) {
+      setNameError(t.colNameError);
+      return;
+    }
+    onSubmit(trimmed, selectedType);
+  };
+
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+    if (e.key === 'Enter' && !saving) handleSubmit();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }} onKeyDown={handleKey} tabIndex={-1}>
+      <div className="modal-card" role="dialog" aria-modal="true">
+        <div className="modal-head">
+          <span className="modal-title">{t.addColumnTitle}</span>
+          <button className="icon-button" onClick={onClose} aria-label={t.close}><X size={17} /></button>
+        </div>
+
+        {/* Column name */}
+        <div className="modal-copy">
+          <label className="modal-field-label" htmlFor="col-name-input">{t.colNameLabel}</label>
+          <input
+            id="col-name-input"
+            className={`login-input${nameError ? ' login-input-error' : ''}`}
+            dir="ltr"
+            value={name}
+            autoFocus
+            disabled={saving}
+            placeholder={t.colNamePlaceholder}
+            onChange={(e) => { setName(e.target.value); setNameError(''); }}
+          />
+          {nameError && (
+            <div className="modal-field-error" role="alert">
+              <AlertCircle size={13} /><span>{nameError}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Column type picker */}
+        <div className="modal-copy">
+          <div className="modal-field-label">{t.colTypeLabel}</div>
+          <div className="col-type-list">
+            {COLUMN_TYPES.map((ct) => (
+              <button
+                key={ct.value}
+                type="button"
+                className={`col-type-row${selectedType === ct.value ? ' selected' : ''}`}
+                onClick={() => setSelectedType(ct.value)}
+                disabled={saving}
+              >
+                <span className="col-type-icon">{ct.icon}</span>
+                <span className="col-type-label">{locale === 'ar' ? ct.labelAr : ct.labelEn}</span>
+                <span className="col-type-raw">{ct.value}</span>
+                {selectedType === ct.value && <Check size={14} className="col-type-check" />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="modal-actions">
+          <button className="control-button" onClick={onClose} disabled={saving}>{t.cancel}</button>
+          <button className="primary-button" onClick={handleSubmit} disabled={saving}>
+            {saving ? <><RefreshCw size={14} className="spin" />{t.saving}</> : t.add}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ========================= CONFIRM DELETE MODAL ========================= */
+function ConfirmDeleteModal({ locale, onClose, onConfirm, saving }: { locale: Locale; onClose: () => void; onConfirm: () => void; saving: boolean }) {
+  const t = copy[locale];
+
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+    if (e.key === 'Enter' && !saving) onConfirm();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }} onKeyDown={handleKey} tabIndex={-1}>
+      <div className="modal-card" role="dialog" aria-modal="true">
+        <div className="modal-head">
+          <span className="modal-title">{t.confirmDeleteTitle}</span>
+          <button className="icon-button" onClick={onClose} aria-label={t.close}><X size={17} /></button>
+        </div>
+        <div className="modal-copy">{t.confirmDeleteBody}</div>
+        <div className="modal-actions">
+          <button className="control-button" onClick={onClose} disabled={saving}>{t.cancel}</button>
+          <button className="danger-button" onClick={onConfirm} disabled={saving}>
+            {saving ? <><RefreshCw size={14} className="spin" />{t.saving}</> : t.delete}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SqlPanel({ locale, onClose }: { locale: Locale; onClose: () => void }) {
     const t = copy[locale];
     const sql = `-- Updated handle_table_operations — authenticated role only.
@@ -340,6 +466,11 @@ export default function App() {
   const [editData, setEditData] = useState<Record<string, string>>({});
   const [savingEdit, setSavingEdit] = useState(false);
   const toastId = useRef(0);
+  // ── Modal state ──
+  const [addColOpen, setAddColOpen] = useState(false);
+  const [savingCol, setSavingCol] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [savingDel, setSavingDel] = useState(false);
   const selected = tables.find((item) => item.table_name === selectedName);
   const t = copy[locale];
 
@@ -451,25 +582,36 @@ export default function App() {
     if (!e && data) setRows(byId(data as Record<string, unknown>[]));
   }, [selectedName]);
 
-  const handleDelete = useCallback(async (rowId: string) => {
+  const handleDelete = useCallback((rowId: string) => {
     if (!selectedName) return;
     if (rowId.startsWith('idx-')) { notify(t.noId); return; }
-    if (!window.confirm(t.confirmDelete)) return;
-    const { error: delError } = await supabase.rpc('handle_table_operations', { operation: 'DELETE', table_name: selectedName, row_id: Number(rowId) });
-    if (delError) { notify(`${t.deleteError}: ${delError.message}`); return; }
-    notify(t.deleted);
-    await reloadRows();
-  }, [selectedName, notify, t, reloadRows]);
+    setDeleteTarget(rowId);
+  }, [selectedName, notify, t]);
 
-  const handleAddColumn = useCallback(async () => {
+  const handleConfirmDelete = useCallback(async () => {
+    if (!selectedName || !deleteTarget) return;
+    setSavingDel(true);
+    const { error: delError } = await supabase.rpc('handle_table_operations', { operation: 'DELETE', table_name: selectedName, row_id: Number(deleteTarget) });
+    setSavingDel(false);
+    if (delError) { notify(`${t.deleteError}: ${delError.message}`); setDeleteTarget(null); return; }
+    notify(t.deleted);
+    setDeleteTarget(null);
+    await reloadRows();
+  }, [selectedName, deleteTarget, notify, t, reloadRows]);
+
+  const handleAddColumn = useCallback(() => {
     if (!selectedName) return;
-    const name = window.prompt(t.columnName)?.trim();
-    if (!name) return;
-    const type = (window.prompt(t.columnType, 'text') ?? '').trim().toLowerCase();
-    if (!type) return;
-    const { error: colError } = await supabase.rpc('handle_table_operations', { operation: 'ADD_COLUMN', table_name: selectedName, column_name: name, column_type: type });
+    setAddColOpen(true);
+  }, [selectedName]);
+
+  const handleSubmitColumn = useCallback(async (colName: string, colType: string) => {
+    if (!selectedName) return;
+    setSavingCol(true);
+    const { error: colError } = await supabase.rpc('handle_table_operations', { operation: 'ADD_COLUMN', table_name: selectedName, column_name: colName, column_type: colType });
+    setSavingCol(false);
     if (colError) { notify(`${t.addColumnError}: ${colError.message}`); return; }
     notify(t.columnAdded);
+    setAddColOpen(false);
     await discover();
     await reloadRows();
   }, [selectedName, notify, t, discover, reloadRows]);
@@ -605,6 +747,22 @@ export default function App() {
         </section>
       </main>
       {drawerOpen && <SqlPanel locale={locale} onClose={() => setDrawerOpen(false)} />}
+      {addColOpen && (
+        <AddColumnModal
+          locale={locale}
+          onClose={() => setAddColOpen(false)}
+          onSubmit={handleSubmitColumn}
+          saving={savingCol}
+        />
+      )}
+      {deleteTarget !== null && (
+        <ConfirmDeleteModal
+          locale={locale}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleConfirmDelete}
+          saving={savingDel}
+        />
+      )}
       <div className="toast-stack" aria-live="polite">{toasts.map((toast) => <div className="toast" key={toast.id}><Check size={16} />{toast.message}</div>)}</div>
     </div>
   );
